@@ -1,15 +1,15 @@
 "use client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import Image from "next/image"; // Import Image for optimized image handling
+import Image from "next/image";
 
 export default function LoginPage() {
-  const [loginInput, setLoginInput] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
+  const [loginInput, setLoginInput] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
+  const [error, setError] = useState<string>("");
   const router = useRouter();
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError("");
 
@@ -34,69 +34,65 @@ export default function LoginPage() {
       const username = data.user?.name || data.user?.username || loginInput;
       localStorage.setItem("username", username);
 
-      router.push("/home?welcome=true"); // Redirect to home
+      router.push("/home?welcome=true");
     } catch (err) {
       setError(err instanceof Error ? err.message : "An unexpected error occurred.");
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-start bg-gray-100 relative">
-      {/* Background Image - Full Screen Width */}
-      <Image
-        src="/Frame2.png" // Path relative to the public directory
-        alt="Background Image"
-        layout="fill" // Fills the container
-        objectFit="cover" // Ensures the image covers the full screen while maintaining aspect ratio
-        quality={100} // High quality for clarity
-        className="absolute inset-0 z-0"
-      />
+    <div className="flex min-h-screen w-full bg-gray-100">
+      {/* Image Section */}
+      <div className="hidden md:flex md:w-1/2 relative">
+        <Image
+          src="/6310507.jpg"
+          alt="Background Image"
+          layout="fill"
+          objectFit="cover"
+          quality={100}
+          className="rounded-r-lg"
+        />
+      </div>
 
-      {/* Login Form and Additional Text - Positioned on the Left Side */}
-      <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-md ml-10 z-10 relative">
-        <h1 className="text-2xl font-bold mb-6 text-center">Login to Our Service</h1>
-        {error && <p className="text-red-500 mb-4 text-center">{error}</p>}
-        <form onSubmit={handleSubmit}>
-          <div className="mb-4">
-            <label htmlFor="loginInput" className="block text-sm font-medium text-gray-700">
-              Username / Email
-            </label>
-            <input
-              type="text"
-              id="loginInput"
-              value={loginInput}
-              onChange={(e) => setLoginInput(e.target.value)}
-              className="mt-1 w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Enter username or email"
-              required
-            />
+      {/* Login Form Section */}
+      <div className="w-full md:w-1/2 flex items-center justify-center p-4 sm:p-5 bg-white shadow-xl">
+        <div className="w-full max-w-md space-y-3">
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-800 text-center mb-3">Welcome Back</h1>
+          {error && <p className="text-red-500 text-center text-sm">{error}</p>}
+          <form onSubmit={handleSubmit} className="space-y-3">
+            <div>
+              <label className="block text-gray-700 text-sm font-medium mb-1">Username / Email</label>
+              <input
+                type="text"
+                value={loginInput}
+                onChange={(e) => setLoginInput(e.target.value)}
+                className="w-full p-2 sm:p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 text-sm sm:text-base"
+                placeholder="Enter username or email"
+                required
+              />
+            </div>
+            <div>
+              <label className="block text-gray-700 text-sm font-medium mb-1">Password</label>
+              <input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="w-full p-2 sm:p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 text-sm sm:text-base"
+                placeholder="Enter your password"
+                required
+              />
+            </div>
+            <button
+              type="submit"
+              className="w-full bg-blue-500 text-white p-2 sm:p-2.5 rounded-lg font-semibold hover:bg-blue-600 transition text-sm sm:text-base"
+            >
+              Log In
+            </button>
+          </form>
+          <div className="text-center space-y-0.5">
+            <p className="text-blue-500 text-sm font-medium">Admin?</p>
+            <p className="text-gray-600 text-xs sm:text-sm">If you are not a user, you are not welcome.</p>
           </div>
-          <div className="mb-6">
-            <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-              Password
-            </label>
-            <input
-              type="password"
-              id="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="mt-1 w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Enter your password"
-              required
-            />
-          </div>
-          <button
-            type="submit"
-            className="w-full bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600 transition duration-200"
-          >
-            Log In
-          </button>
-        </form>
-
-        {/* Additional Text Below the Form */}
-        <div className="mt-6 text-center">
-          <p className="text-blue-500 text-sm font-medium text-start">Admin?</p>
-          <p className="text-gray-700 text-sm mt-1 text-start">If you are not user you are not welcome.</p>
         </div>
       </div>
     </div>
