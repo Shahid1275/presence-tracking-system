@@ -55,13 +55,17 @@ export default function LoginPage() {
       </div>
 
       {/* Login Form Section */}
-      <div className="w-full md:w-1/2 flex items-center justify-center p-4 sm:p-5 bg-white shadow-xl">
-        <div className="w-full max-w-md space-y-3">
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-800 text-center mb-3">Welcome Back</h1>
+      <div className="w-full md:w-1/2 flex items-center justify-center p-4 sm:p-6 bg-white shadow-xl">
+        <div className="w-full max-w-md space-y-4">
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-800 text-center mb-4">
+            Welcome Back
+          </h1>
           {error && <p className="text-red-500 text-center text-sm">{error}</p>}
-          <form onSubmit={handleSubmit} className="space-y-3">
+          <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-gray-700 text-sm font-medium mb-1">Username / Email</label>
+              <label className="block text-gray-700 text-sm font-medium mb-1">
+                Username / Email
+              </label>
               <input
                 type="text"
                 value={loginInput}
@@ -72,7 +76,9 @@ export default function LoginPage() {
               />
             </div>
             <div>
-              <label className="block text-gray-700 text-sm font-medium mb-1">Password</label>
+              <label className="block text-gray-700 text-sm font-medium mb-1">
+                Password
+              </label>
               <input
                 type="password"
                 value={password}
@@ -89,9 +95,11 @@ export default function LoginPage() {
               Log In
             </button>
           </form>
-          <div className="text-center space-y-0.5">
-            <p className="text-blue-500 text-sm font-medium">Admin?</p>
-            <p className="text-gray-600 text-xs sm:text-sm">If you are not a user, you are not welcome.</p>
+          <div className=" space-y-2">
+            <p className="text-blue-500 text-sm font-medium text-start cursor-pointer">Admin?</p>
+            <p className="text-gray-600 text-xs sm:text-sm text-start">
+              If you are not a user, you are not welcome.
+            </p>
           </div>
         </div>
       </div>

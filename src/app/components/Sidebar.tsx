@@ -62,7 +62,6 @@ export default function Sidebar() {
 
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
-    console.log("Sidebar toggled:", isSidebarOpen ? "closing" : "opening");
   };
 
   const handleSearch = (e: React.FormEvent) => {
@@ -91,20 +90,38 @@ export default function Sidebar() {
             {/* Sidebar Header with Centered Logo and Text */}
             <div className="w-full flex items-center justify-between mb-6">
               <div className="flex items-center gap-2 mx-auto">
-                <div className="relative w-8 h-8">
+                <div
+                  className={`relative w-8 h-8 transition-all duration-300 ${
+                    isSidebarOpen ? "scale-100" : "scale-90"
+                  }`}
+                >
                   <Image
                     src="/VUlogo.png" // Replace with your logo path
                     alt="VU Logo"
                     fill
-                    className="object-contain"
+                    className="object-contain transition-all duration-300 hover:scale-90"
                   />
                 </div>
                 {isSidebarOpen && (
-                  <span className="text-gray-200 text-xl font-semibold">
+                  <span className="text-gray-200 text-md font-semibold transition-all duration-300">
                     Virtual University
                   </span>
                 )}
               </div>
+
+              {/* Toggle Button Inside Sidebar */}
+              <button
+                onClick={toggleSidebar}
+                className={`p-2  text-white transition-all duration-300 ${
+                  isSidebarOpen ? "ml-2" : "mx-auto"
+                }`}
+              >
+                {isSidebarOpen ? (
+                  <FaChevronLeft size={16} />
+                ) : (
+                  <FaChevronRight size={16} />
+                )}
+              </button>
             </div>
 
             {/* Dashboard Title */}
@@ -119,14 +136,14 @@ export default function Sidebar() {
 
             {/* Search Functionality */}
             {isSidebarOpen && (
-              <form onSubmit={handleSearch} className="w-full mb-4">
+              <form onSubmit={handleSearch} className="w-full mb-3">
                 <div className="relative">
                   <input
                     type="text"
                     placeholder="Search..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full p-2 pl-10 rounded-lg bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-gray-500"
+                    className="w-full p-2 pl-10 text-sm rounded-lg bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-gray-500 transition-all duration-300"
                   />
                   <FaSearch className="absolute left-3 top-3 text-gray-400" />
                 </div>
@@ -143,20 +160,22 @@ export default function Sidebar() {
                 {filteredModules.map((module) => (
                   <li
                     key={module.name}
-                    className={`flex items-center gap-3 p-3 rounded-lg cursor-pointer hover:bg-gray-700 transition-colors ${
+                    className={`flex items-center gap-3 p-3 rounded-lg cursor-pointer hover:bg-gray-700 transition-all duration-300 ${
                       module.isLogout ? "mt-auto" : ""
                     }`}
                     onClick={module.isLogout ? handleLogout : undefined}
                   >
                     <span
-                      className={`text-xl ${
+                      className={` hover:opacity-90 transition-all duration-300 ${
                         !isSidebarOpen ? "mx-auto" : ""
                       }`}
                     >
                       {module.icon}
                     </span>
                     {isSidebarOpen && (
-                      <span className="text-sm">{module.name}</span>
+                      <span className="text-sm hover:opacity-90 transition-opacity duration-300">
+                        {module.name}
+                      </span>
                     )}
                   </li>
                 ))}
@@ -164,32 +183,6 @@ export default function Sidebar() {
             </nav>
           </div>
         </div>
-
-        {/* Toggle Buttons Outside Sidebar at Top Corners */}
-        {!isSidebarOpen && (
-          <button
-            onClick={() => {
-              toggleSidebar();
-              console.log("Left toggle button clicked (open sidebar)");
-            }}
-            className="absolute left-16 top-4 p-2 bg-gray-800 text-white transition-colors duration-300"
-            style={{ left: "4rem" }} // Match the width of the collapsed sidebar (w-16)
-          >
-            <FaChevronLeft size={16} />
-          </button>
-        )}
-        {isSidebarOpen && (
-          <button
-            onClick={() => {
-              toggleSidebar();
-              console.log("Right toggle button clicked (close sidebar)");
-            }}
-            className="absolute right-0 top-4 p-2 bg-gray-800 text-white transition-colors duration-300"
-            style={{ left: "16rem" }} // Match the width of the expanded sidebar (w-64)
-          >
-            <FaChevronRight size={16} />
-          </button>
-        )}
       </div>
 
       {/* Add CSS to hide horizontal scrollbar when sidebar is closed */}

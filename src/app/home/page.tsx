@@ -21,7 +21,7 @@ export default function HomePage() {
     <Layout>
       <div className="container mx-auto p-4 h-screen flex flex-col items-center justify-center text-center overflow-hidden">
         {/* Responsive Heading */}
-        <h1 className="text-3xl font-bold sm:text-4xl md:text-5xl lg:text-6xl">
+        <h1 className="text-sm sm:text-lg md:text-2xl lg:text-3xl font-bold sm:text-4xl md:text-5xl lg:text-6xl">
          Welcome To Home Page
         </h1>
 
