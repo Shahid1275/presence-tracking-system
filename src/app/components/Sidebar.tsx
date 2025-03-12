@@ -1,6 +1,8 @@
 "use client";
 import { useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 import {
   FaUsers,
   FaCalendar,
@@ -31,27 +33,27 @@ import {
 import { useRouter } from "next/navigation";
 
 const modules = [
-  { name: "Attendances", icon: <FaUsers /> },
-  { name: "Batch", icon: <FaCalendar /> },
-  { name: "BreakType", icon: <FaCoffee /> },
-  { name: "City", icon: <FaCity /> },
-  { name: "DegreeProgram", icon: <FaGraduationCap /> },
-  { name: "Device", icon: <FaLaptop /> },
-  { name: "FingerPrint", icon: <FaFingerprint /> },
-  { name: "Holiday", icon: <FaUmbrellaBeach /> },
-  { name: "Leave", icon: <FaFileAlt /> },
-  { name: "LeaveCategory", icon: <FaFolder /> },
-  { name: "LeaveStatus", icon: <FaCheckCircle /> },
-  { name: "LeaveType", icon: <FaClock /> },
-  { name: "Location", icon: <FaMapMarkerAlt /> },
-  { name: "OfficeTime", icon: <FaBusinessTime /> },
-  { name: "Permissions", icon: <FaLock /> },
-  { name: "Project", icon: <FaProjectDiagram /> },
-  { name: "Province", icon: <FaMap /> },
-  { name: "Roles", icon: <FaUserTag /> },
-  { name: "Student", icon: <FaUserGraduate /> },
-  { name: "StudentStatus", icon: <FaUserCheck /> },
-  { name: "User", icon: <FaUser /> },
+  { name: "Attendances", icon: <FaUsers />, path: "/attendances" },
+  { name: "Batch", icon: <FaCalendar />, path: "/batch" },
+  { name: "BreakType", icon: <FaCoffee />, path: "/breaktype" },
+  { name: "City", icon: <FaCity />, path: "/city" },
+  { name: "DegreeProgram", icon: <FaGraduationCap />, path: "/degreeprogram" },
+  { name: "Device", icon: <FaLaptop />, path: "/device" },
+  { name: "FingerPrint", icon: <FaFingerprint />, path: "/fingerprint" },
+  { name: "Holiday", icon: <FaUmbrellaBeach />, path: "/holiday" },
+  { name: "Leave", icon: <FaFileAlt />, path: "/leave" },
+  { name: "LeaveCategory", icon: <FaFolder />, path: "/leavecategory" },
+  { name: "LeaveStatus", icon: <FaCheckCircle />, path: "/leavestatus" },
+  { name: "LeaveType", icon: <FaClock />, path: "/leavetype" },
+  { name: "Location", icon: <FaMapMarkerAlt />, path: "/location" },
+  { name: "OfficeTime", icon: <FaBusinessTime />, path: "/officetime" },
+  { name: "Permissions", icon: <FaLock />, path: "/permissions" },
+  { name: "Project", icon: <FaProjectDiagram />, path: "/project" },
+  { name: "Province", icon: <FaMap />, path: "/provinces" },
+  { name: "Roles", icon: <FaUserTag />, path: "/roles" },
+  { name: "Student", icon: <FaUserGraduate />, path: "/student" },
+  { name: "StudentStatus", icon: <FaUserCheck />, path: "/studentstatus" },
+  { name: "User", icon: <FaUser />, path: "/user" },
   { name: "Logout", icon: <FaSignOutAlt />, isLogout: true },
 ];
 
@@ -59,6 +61,7 @@ export default function Sidebar() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const router = useRouter();
+  const pathname = usePathname();
 
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
@@ -80,9 +83,9 @@ export default function Sidebar() {
   return (
     <>
       {/* Sidebar */}
-      <div className="relative h-screen">
+      <div className="fixed h-screen z-40">
         <div
-          className={`bg-gray-800 text-white h-screen fixed shadow-xl z-40 transition-all duration-300 ease-in-out ${
+          className={`bg-gray-800 text-white h-screen shadow-xl transition-all duration-300 ease-in-out ${
             isSidebarOpen ? "w-64" : "w-16"
           }`}
         >
@@ -112,7 +115,7 @@ export default function Sidebar() {
               {/* Toggle Button Inside Sidebar */}
               <button
                 onClick={toggleSidebar}
-                className={`p-2  text-white transition-all duration-300 ${
+                className={`p-2 text-white transition-all duration-300 ${
                   isSidebarOpen ? "ml-2" : "mx-auto"
                 }`}
               >
@@ -153,7 +156,7 @@ export default function Sidebar() {
             {/* Module List */}
             <nav
               className={`flex-1 w-full overflow-y-auto ${
-                !isSidebarOpen ? "no-scrollbar" : ""
+                !isSidebarOpen ? "scrollbar-hidden" : ""
               }`}
             >
               <ul className="space-y-2">
@@ -165,18 +168,27 @@ export default function Sidebar() {
                     }`}
                     onClick={module.isLogout ? handleLogout : undefined}
                   >
-                    <span
-                      className={` hover:opacity-90 transition-all duration-300 ${
-                        !isSidebarOpen ? "mx-auto" : ""
+                    <Link
+                      href={module.path || "#"}
+                      className={`flex items-center gap-3 w-full ${
+                        pathname === module.path
+                          ? "bg-gray-700 text-white"
+                          : "text-gray-300"
                       }`}
                     >
-                      {module.icon}
-                    </span>
-                    {isSidebarOpen && (
-                      <span className="text-sm hover:opacity-90 transition-opacity duration-300">
-                        {module.name}
+                      <span
+                        className={`hover:opacity-90 transition-all duration-300 ${
+                          !isSidebarOpen ? "mx-auto" : ""
+                        }`}
+                      >
+                        {module.icon}
                       </span>
-                    )}
+                      {isSidebarOpen && (
+                        <span className="text-sm hover:opacity-90 transition-opacity duration-300">
+                          {module.name}
+                        </span>
+                      )}
+                    </Link>
                   </li>
                 ))}
               </ul>
@@ -185,13 +197,16 @@ export default function Sidebar() {
         </div>
       </div>
 
-      {/* Add CSS to hide horizontal scrollbar when sidebar is closed */}
+      {/* CSS to hide scrollbars only when sidebar is closed */}
       <style jsx>{`
-        .no-scrollbar {
-          overflow-x: hidden;
+        .scrollbar-hidden {
+          -ms-overflow-style: none; /* IE and Edge */
+          scrollbar-width: none; /* Firefox */
+          overflow-y: auto; /* Hide vertical scrollbar */
+          overflow-x: hidden; /* Hide horizontal scrollbar */
         }
-        .no-scrollbar::-webkit-scrollbar {
-          display: none;
+        .scrollbar-hidden::-webkit-scrollbar {
+          display: none; /* Chrome, Safari, and Opera */
         }
       `}</style>
     </>
