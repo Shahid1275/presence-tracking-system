@@ -1,17 +1,31 @@
 "use client";
 import Sidebar from "./Sidebar";
+import { Box, useTheme } from "@mui/material";
 
 export default function Layout({ children }: { children: React.ReactNode }) {
+  const theme = useTheme();
+
   return (
-    <div className="flex h-screen bg-[#1F2937] overflow-hidden">
-      {/* Fixed Sidebar */}
+    <Box sx={{ display: "flex", height: "100vh", backgroundColor: theme.palette.background.default }}>
+      {/* Sidebar */}
       <Sidebar />
-      {/* Main Content Area */}
-      <main
-        className="flex-1 p-6 bg-[#1F2937] text-white transition-margin duration-300 ease-in-out overflow-y-auto ml-64" // Adjust ml based on sidebar width (64px when open)
+      {/* Main Content */}
+      <Box
+        component="main"
+        sx={{
+          flexGrow: 1,
+          p: 3,
+          overflowY: "auto",
+          overflowX: "hidden", // Prevent horizontal scrolling
+          marginLeft: { xs: 0, sm: 8 }, // Adjust margin for responsive behavior
+          transition: theme.transitions.create("margin", {
+            easing: theme.transitions.easing.sharp,
+            duration: theme.transitions.duration.leavingScreen,
+          }),
+        }}
       >
         {children}
-      </main>
-    </div>
+      </Box>
+    </Box>
   );
 }

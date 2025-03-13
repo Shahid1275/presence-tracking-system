@@ -1,6 +1,3 @@
-
-
-
 "use client";
 
 import { useEffect, useState } from "react";
@@ -8,6 +5,19 @@ import { useRouter } from "next/navigation";
 import { fetchData } from "../utils/fetchData";
 import Layout from "../components/Layout";
 import Link from "next/link";
+import {
+  Container,
+  Typography,
+  Button,
+  List,
+  ListItem,
+  ListItemText,
+  CircularProgress,
+  Alert,
+  Paper,
+  ListItemButton, // Use ListItemButton for clickable list items
+} from "@mui/material";
+import { createTheme, ThemeProvider } from "@mui/material/styles";
 
 interface Province {
   id: number;
@@ -17,6 +27,32 @@ interface Province {
 interface ApiResponse {
   data: Province[];
 }
+
+// Custom MUI theme
+const theme = createTheme({
+  palette: {
+    primary: {
+      main: "#3f51b5", // A modern blue
+    },
+    secondary: {
+      main: "#f50057", // A modern pink
+    },
+    background: {
+      default: "#1F2937", // Dark background
+      paper: "#374151", // Slightly lighter for paper components
+    },
+    text: {
+      primary: "#ffffff", // White text
+      secondary: "#b0b0b0", // Light gray for secondary text
+    },
+  },
+  typography: {
+    fontFamily: "'Inter', sans-serif", // Modern font
+    h4: {
+      fontWeight: 700, // Bold heading
+    },
+  },
+});
 
 const ProvincesPage = () => {
   const [provinces, setProvinces] = useState<Province[]>([]);
@@ -42,36 +78,86 @@ const ProvincesPage = () => {
   }, []);
 
   return (
-    <Layout>
-      <div className="min-h-screen bg-[#1F2937] py-12 px-8">
-        <div className="max-w-5xl mx-auto">
-          <h1 className="text-4xl font-extrabold text-white mb-10 text-center tracking-tight">
+    <ThemeProvider theme={theme}>
+      <Layout>
+        <Container
+          maxWidth="lg"
+          sx={{
+            minHeight: "100vh",
+            py: 8,
+            backgroundColor: "background.default",
+          }}
+        >
+          <Typography
+            variant="h4"
+            component="h1"
+            align="center"
+            gutterBottom
+            sx={{ color: "text.primary", fontWeight: "bold", mb: 4 }}
+          >
             Provinces
-          </h1>
+          </Typography>
 
-          {loading && <div className="text-center text-gray-300">Loading...</div>}
-          {error && <div className="text-center text-red-500">{error}</div>}
+          {loading && (
+            <div style={{ textAlign: "center", marginTop: "2rem" }}>
+              <CircularProgress color="primary" />
+            </div>
+          )}
 
-          <div className="bg-gray-900 shadow-lg rounded-xl overflow-hidden border border-gray-800">
-            <ul className="divide-y divide-gray-800">
+          {error && (
+            <Alert severity="error" sx={{ mb: 4 }}>
+              {error}
+            </Alert>
+          )}
+
+          <Button
+            variant="contained"
+            color="primary"
+            component={Link}
+            href="/provinces/create"
+            sx={{ mb: 4 }}
+          >
+            Create New Province
+          </Button>
+
+          <Paper
+            elevation={3}
+            sx={{
+              backgroundColor: "background.paper",
+              borderRadius: 2,
+              overflow: "hidden",
+            }}
+          >
+            <List>
               {provinces.map((province) => (
-                <li key={province.id} className="p-6 text-white hover:bg-gray-800">
-                  <Link href={`/provinces/${province.id}`}>
-                    <span className="text-xl font-semibold">{province.name}</span>
-                  </Link>
-                </li>
+                <ListItem
+                  key={province.id}
+                  disablePadding // Remove padding to make ListItemButton fill the space
+                >
+                  <ListItemButton
+                    component={Link}
+                    href={`/provinces/${province.id}`}
+                    sx={{
+                      "&:hover": {
+                        backgroundColor: "action.hover",
+                      },
+                    }}
+                  >
+                    <ListItemText
+                      primary={
+                        <Typography variant="h6" sx={{ color: "text.primary" }}>
+                          {province.name}
+                        </Typography>
+                      }
+                    />
+                  </ListItemButton>
+                </ListItem>
               ))}
-            </ul>
-          </div>
-
-          <Link href="/provinces/create">
-            <button className="mt-4 p-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
-              Create New Province
-            </button>
-          </Link>
-        </div>
-      </div>
-    </Layout>
+            </List>
+          </Paper>
+        </Container>
+      </Layout>
+    </ThemeProvider>
   );
 };
 
