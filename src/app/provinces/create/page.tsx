@@ -1,52 +1,9 @@
-// "use client";
-
-// import { useState } from "react";
-// import { useRouter } from "next/navigation";
-// import { createProvince } from "../../utils/api";
-// import Layout from "@/app/components/Layout";
-
-// const CreateProvincePage = () => {
-//   const [name, setName] = useState("");
-//   const [error, setError] = useState<string | null>(null);
-//   const router = useRouter();
-
-//   const handleSubmit = async (e: React.FormEvent) => {
-//     e.preventDefault();
-//     try {
-//       await createProvince({ name });
-//       router.push("/provinces");
-//     } catch (err) {
-//       setError(err instanceof Error ? err.message : "An error occurred");
-//     }
-//   };
-
-//   return (
-//     <Layout>
-
-// <div>
-//       <h1>Create Province</h1>
-//       {error && <div>Error: {error}</div>}
-//       <form onSubmit={handleSubmit}>
-//         <input
-//           type="text"
-//           value={name}
-//           onChange={(e) => setName(e.target.value)}
-//           placeholder="Province Name"
-//         />
-//         <button type="submit">Create</button>
-//       </form>
-//     </div>
-//     </Layout>
-//   );
-// };
-
-// export default CreateProvincePage;
 "use client";
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Layout from "../../components/Layout";
-import { Button, TextField, Typography, Alert, Paper } from "@mui/material";
+import { Button, TextField, Typography, Alert, Paper, Stack } from "@mui/material";
 
 const CreateProvincePage = () => {
   const [name, setName] = useState("");
@@ -110,14 +67,23 @@ const CreateProvincePage = () => {
             margin="normal"
             required
           />
-          <Button
-            type="submit"
-            variant="contained"
-            color="primary"
-            disabled={loading}
-          >
-            {loading ? "Creating..." : "Create"}
-          </Button>
+          <Stack direction="row" spacing={2} sx={{ mt: 2 }}>
+            <Button
+              type="submit"
+              variant="contained"
+              color="primary"
+              disabled={loading}
+            >
+              {loading ? "Creating..." : "Create"}
+            </Button>
+            <Button
+              variant="outlined"
+              color="secondary"
+              onClick={() => router.push("/provinces")}
+            >
+              Cancel
+            </Button>
+          </Stack>
         </form>
       </Paper>
     </Layout>

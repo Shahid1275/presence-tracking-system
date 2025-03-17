@@ -1,3 +1,4 @@
+
 "use client";
 import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
@@ -114,6 +115,9 @@ export default function Sidebar() {
 
   // Restore scroll position on component mount
   useEffect(() => {
+    if (sidebarRef.current) {
+      sidebarRef.current.scrollTop = 0; // Reset scroll position to top
+    }
     restoreScrollPosition();
   }, []);
 
@@ -242,4 +246,3 @@ export default function Sidebar() {
     </Drawer>
   );
 }
-//hello

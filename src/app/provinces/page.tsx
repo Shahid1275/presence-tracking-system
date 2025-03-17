@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { fetchData, deleteProvince } from "../utils/api"; // Import deleteProvince
+import { fetchData, deleteProvince } from "../utils/api";
 import Layout from "../components/Layout";
 import Link from "next/link";
 import {
@@ -27,6 +27,7 @@ import AddIcon from "@mui/icons-material/Add";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
+import { blue, green, red } from "@mui/material/colors";
 
 interface Province {
   id: number;
@@ -98,7 +99,7 @@ const ProvincesPage = () => {
           router.push("/login");
           return;
         }
-  
+
         await deleteProvince(id, token);
         setProvinces(provinces.filter((province) => province.id !== id));
         console.log(`Province with ID ${id} deleted successfully.`);
@@ -112,6 +113,7 @@ const ProvincesPage = () => {
       }
     }
   };
+
   return (
     <Layout>
       <Container maxWidth="lg" sx={{ py: 4 }}>
@@ -192,10 +194,10 @@ const ProvincesPage = () => {
               <TableHead>
                 <TableRow
                   sx={{
-                    backgroundColor: "grey.100",
+                    backgroundColor: "primary.main",
                     "& th": {
                       fontWeight: "bold",
-                      color: "text.primary",
+                      color: "common.white",
                       py: 2,
                     },
                   }}
@@ -231,24 +233,39 @@ const ProvincesPage = () => {
                         <Stack direction="row" spacing={1} justifyContent="flex-end">
                           <Tooltip title="View">
                             <IconButton
-                              color="primary"
                               onClick={() => handleView(province.id)}
+                              sx={{
+                                color: blue[600],
+                                "&:hover": {
+                                  backgroundColor: blue[50],
+                                },
+                              }}
                             >
                               <VisibilityIcon />
                             </IconButton>
                           </Tooltip>
                           <Tooltip title="Edit">
                             <IconButton
-                              color="info"
                               onClick={() => handleEdit(province.id)}
+                              sx={{
+                                color: green[600],
+                                "&:hover": {
+                                  backgroundColor: green[50],
+                                },
+                              }}
                             >
                               <EditIcon />
                             </IconButton>
                           </Tooltip>
                           <Tooltip title="Delete">
                             <IconButton
-                              color="error"
                               onClick={() => handleDelete(province.id)}
+                              sx={{
+                                color: red[600],
+                                "&:hover": {
+                                  backgroundColor: red[50],
+                                },
+                              }}
                             >
                               <DeleteIcon />
                             </IconButton>

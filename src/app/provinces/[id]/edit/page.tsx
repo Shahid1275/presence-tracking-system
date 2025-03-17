@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useEffect, useState } from "react";
@@ -16,14 +15,18 @@ import {
   Snackbar,
 } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 
 const EditProvincePage = () => {
   const { id } = useParams();
-  const [name, setName] = useState<string>("");
-  const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [success, setSuccess] = useState(false);
   const router = useRouter();
+  const provinceId = id ? Number(id) : NaN; // Convert id to number safely
+  
+  const [name, setName] = useState<string>("");
+  const [provinceName, setProvinceName] = useState<string>("");
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [success, setSuccess] = useState(false);
 
   useEffect(() => {
     const fetchProvince = async () => {
@@ -33,20 +36,32 @@ const EditProvincePage = () => {
           router.push("/login");
           return;
         }
-        if (!id || isNaN(Number(id))) {
+        if (isNaN(provinceId)) {
           throw new Error("Invalid province ID");
         }
+        const response = await getProvince(provinceId, token);
+        console.log("Fetched Province:", response);
 
-        const data = await getProvince(Number(id), token);
-        console.log("Fetched Province:", data);
-        setName(typeof data.name === "string" ? data.name : "");
+        if (response.data && response.data.length > 0) {
+          const provinceData = response.data[0];
+          if (provinceData.name) {
+            setName(provinceData.name);
+            setProvinceName(provinceData.name);
+          } else {
+            throw new Error("Province name is missing in API response.");
+          }
+        } else {
+          throw new Error("Province not found.");
+        }
       } catch (err) {
         setError(err instanceof Error ? err.message : "An error occurred");
+      } finally {
+        setLoading(false);
       }
     };
 
     fetchProvince();
-  }, [id, router]);
+  }, [provinceId, router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -59,7 +74,7 @@ const EditProvincePage = () => {
         router.push("/login");
         return;
       }
-      await updateProvince(Number(id), { name }, token);
+      await updateProvince(provinceId, { name }, token);
       setSuccess(true);
       setTimeout(() => router.push(`/provinces`), 1000);
     } catch (err) {
@@ -71,47 +86,48 @@ const EditProvincePage = () => {
 
   return (
     <Layout>
-      <Paper sx={{ p: 4, maxWidth: 600, mx: "auto", mt: 4 }}>
+      <Paper sx={{ p: 4, maxWidth: 600, mx: "auto", mt: 4, borderRadius: 2, boxShadow: 3 }}>
         <Button startIcon={<ArrowBackIcon />} onClick={() => router.back()} sx={{ mb: 2 }}>
           Back
         </Button>
-        <Typography variant="h4" gutterBottom>
-          Edit Province
+        <Typography variant="h4" gutterBottom sx={{ fontWeight: "bold" }}>
+          Edit Province:{" "}
+          <span style={{ color: "#1976d2" }}>
+            {loading ? <CircularProgress size={20} /> : provinceName || "Not Found"}
+          </span>
         </Typography>
         {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
+        {loading ? (
+          <CircularProgress />
+        ) : (
+          <form onSubmit={handleSubmit}>
+            <TextField
+              fullWidth
+              label="Province Name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              margin="normal"
+              required
+              sx={{ mb: 2 }}
+            />
+            <Stack direction="row" spacing={2} sx={{ mt: 2 }}>
+              <Button type="submit" variant="contained" disabled={!name.trim()}>
+                Update
+              </Button>
+              <Button variant="outlined" onClick={() => router.back()}>
+                Cancel
+              </Button>
+            </Stack>
+          </form>
+        )}
         <Snackbar
           open={success}
           autoHideDuration={3000}
           onClose={() => setSuccess(false)}
-          message="Province updated successfully!"
-        />
-        <form onSubmit={handleSubmit}>
-          <TextField
-            fullWidth
-            label="Province Name"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            margin="normal"
-            required
-            disabled={loading}
-          />
-          <Stack direction="row" spacing={2} sx={{ mt: 2 }}>
-            <Button
-              type="submit"
-              variant="contained"
-              disabled={loading || !name.trim()}
-            >
-              {loading ? <CircularProgress size={24} /> : "Update"}
-            </Button>
-            <Button
-              variant="outlined"
-              onClick={() => router.back()}
-              disabled={loading}
-            >
-              Cancel
-            </Button>
-          </Stack>
-        </form>
+          anchorOrigin={{ vertical: "top", horizontal: "center" }}
+        >
+          <Alert severity="success" icon={<CheckCircleIcon fontSize="inherit" />}>Province updated successfully!</Alert>
+        </Snackbar>
       </Paper>
     </Layout>
   );
