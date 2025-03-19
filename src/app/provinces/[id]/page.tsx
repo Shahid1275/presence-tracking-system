@@ -100,7 +100,7 @@ if (data?.data && Array.isArray(data.data) && data.data.length > 0) {
 
           {/* Province Name */}
           <Typography variant="h4" component="h1" gutterBottom>
-            {province.name}
+            Province Details
           </Typography>
 
           {/* Province Details */}
@@ -117,17 +117,6 @@ if (data?.data && Array.isArray(data.data) && data.data.length > 0) {
             </Grid>
           </Grid>
 
-          {/* Edit Button */}
-          <Stack direction="row" spacing={2} sx={{ mt: 4 }}>
-            {/* <Button
-              variant="contained"
-              color="primary"
-              component={Link}
-              href={`/provinces/${province.id}/edit`}
-            >
-              Edit Province
-            </Button> */}
-          </Stack>
         </Paper>
       </Container>
     </Layout>
