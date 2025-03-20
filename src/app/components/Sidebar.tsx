@@ -337,7 +337,7 @@ import {
 
 const modules = [
   { name: "Attendances", icon: <PeopleIcon />, path: "/attendances" },
-  { name: "Batch", icon: <CalendarIcon />, path: "/batch" },
+  { name: "Batch", icon: <CalendarIcon />, path: "/batches" },
   { name: "BreakType", icon: <CoffeeIcon />, path: "/breaktype" },
   { name: "Cities", icon: <CityIcon />, path: "/cities" },
   { name: "DegreeProgram", icon: <GraduationCapIcon />, path: "/degreeprogram" },

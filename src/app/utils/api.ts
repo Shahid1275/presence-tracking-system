@@ -252,3 +252,146 @@ export const getCitiesByProvince = async (provinceId: number, token: string) => 
     },
   });
 };
+
+// Fetch all batches
+export const getBatches = async (token: string) => {
+  return fetchData<{
+    current_page: number;
+    data: {
+      id: number;
+      title: string;
+      session: string;
+      leaves_allowed: number;
+      working_days: number;
+    }[];
+    first_page_url: string;
+    from: number;
+    last_page: number;
+    last_page_url: string;
+    links: { url: string | null; label: string; active: boolean }[];
+    next_page_url: string | null;
+    path: string;
+    per_page: number;
+    prev_page_url: string | null;
+    to: number;
+    total: number;
+  }>("/batches", {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+};
+
+// Create a new batch
+export const createBatch = async (
+  data: { title: string; session: string; leaves_allowed: number; working_days: number },
+  token: string
+) => {
+  return fetchData<{ message: string }>("/batches/create", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(data),
+  });
+};
+
+// Update a batch
+export const updateBatch = async (
+  id: number,
+  data: { title: string; session: string; leaves_allowed: number; working_days: number },
+  token: string
+) => {
+  return fetchData<{ message: string }>(`/batches/${id}/edit`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(data),
+  });
+};
+
+// Delete a batch
+export const deleteBatch = async (id: number, token: string) => {
+  const response = await fetch(`${API_BASE_URL}/batches/${id}`, {
+    method: "DELETE",
+    headers: {
+      Accept: "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.message || "Failed to delete batch");
+  }
+};
+
+// Get batch details
+export const getBatch = async (id: number, token: string) => {
+  return fetchData<{
+    data: any;
+    id: number;
+    title: string;
+    session: string;
+    leaves_allowed: number;
+    working_days: number;
+  }>(`/batches/${id}`, {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+};
+
+// Get batch leaves
+export const getBatchLeaves = async (id: number, token: string) => {
+  return fetchData<{
+    id: number;
+    title: string;
+    session: string;
+    leaves_allowed: number;
+    working_days: number;
+    leaves: any[]; // Adjust the type based on your API response
+  }>(`/batches/${id}/leaves`, {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+};
+
+// Update batch leave quota
+export const updateBatchLeaveQuota = async (
+  id: number,
+  data: { leaves_allowed: number },
+  token: string
+) => {
+  return fetchData<{ message: string }>(`/batches/${id}/leaves`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(data),
+  });
+};
+
+// Get batch by name
+export const getBatchByName = async (name: string, token: string) => {
+  return fetchData<{
+    id: number;
+    title: string;
+    session: string;
+    leaves_allowed: number;
+    working_days: number;
+  }>(`/batches/name/${name}`, {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+};

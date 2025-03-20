@@ -45,7 +45,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       }}
     >
       {/* Sidebar */}
-      <Sidebar />
+      <Sidebar children={undefined} />
       {/* Main Content */}
       <Box
         component="main"
