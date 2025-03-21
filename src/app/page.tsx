@@ -34,7 +34,7 @@ export default function LoginPage() {
       const username = data.user?.name || data.user?.username || loginInput;
       localStorage.setItem("username", username);
 
-      router.push("/home?welcome=true");
+      router.push("/dashboard?welcome=true");
     } catch (err) {
       setError(err instanceof Error ? err.message : "An unexpected error occurred.");
     }

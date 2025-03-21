@@ -164,32 +164,7 @@ export default function HomePage() {
             </Grid>
 
             {/* Feature 3 */}
-            <Grid item xs={12} md={4}>
-              <motion.div variants={fadeInUp}>
-                <Card
-                  sx={{
-                    height: "100%",
-                    borderRadius: 2,
-                    boxShadow: 3,
-                    transition: "transform 0.3s ease-in-out",
-                    "&:hover": { transform: "scale(1.05)" },
-                  }}
-                >
-                  <CardContent>
-                    <Typography
-                      variant="h6"
-                      component="h3"
-                      sx={{ fontWeight: "bold", mb: 2 }}
-                    >
-                      Mobile-Friendly
-                    </Typography>
-                    <Typography variant="body1">
-                      Access the system on any device, anytime, anywhere.
-                    </Typography>
-                  </CardContent>
-                </Card>
-              </motion.div>
-            </Grid>
+            <Grid item xs={12} md={4}> <motion.div variants={fadeInUp}> <Card sx={{ height: "100%", borderRadius: 2, boxShadow: 3, transition: "transform 0.3s ease-in-out", "&:hover": { transform: "scale(1.05)" }, }} > <CardContent> <Typography variant="h6" component="h3" sx={{ fontWeight: "bold", mb: 2 }} > Fingerprint Authentication </Typography> <Typography variant="body1"> Securely access the system using fingerprint recognition. </Typography> </CardContent> </Card> </motion.div> </Grid>
           </Grid>
         </motion.div>
       </Container>
