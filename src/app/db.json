@@ -454,3 +454,13 @@
       "total": 1
     }
   }
+
+
+
+
+
+  "API_BASE_URL  =   http://192.168.50.218/laravel-project/attendance-system/public/api/users 
+
+1. BEARER token pass is necessary
+2. headers like accept type json application is also necessary
+"
