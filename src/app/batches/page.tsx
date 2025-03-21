@@ -41,7 +41,10 @@ interface Batch {
   title: string;
   session: string;
   leaves_allowed: number;
-  start_date: string | null; // Snake_case to match API
+  working_days: number; // Replaced start_date with working_days
+  created_at?: string;
+  updated_at?: string;
+  deleted_at?: string | null;
 }
 
 interface PaginatedApiResponse {
@@ -219,89 +222,89 @@ const BatchesPage = () => {
 
         {/* Batches Table */}
         {!loading && !error && (
-          <TableContainer
-            component={Paper}
-            sx={{
-              borderRadius: 2,
-              boxShadow: "0 4px 12px rgba(0, 0, 0, 0.05)",
-              overflowX: "auto",
-            }}
-          >
-            <Table sx={{ minWidth: 650 }}>
-              <TableHead>
+        <TableContainer
+        component={Paper}
+        sx={{
+          borderRadius: 2,
+          boxShadow: "0 4px 12px rgba(0, 0, 0, 0.05)",
+          overflowX: "auto",
+        }}
+      >
+        <Table sx={{ minWidth: 650 }}>
+          <TableHead>
+            <TableRow
+              sx={{
+                backgroundColor: "primary.main",
+                "& th": { fontWeight: "bold", color: "common.white", py: 2 },
+              }}
+            >
+              <TableCell>ID</TableCell>
+              <TableCell>Title</TableCell>
+              <TableCell>Session</TableCell>
+              <TableCell>Leaves Allowed</TableCell>
+              <TableCell>Working Days</TableCell>
+              <TableCell align="right">Actions</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {batches.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={6} align="center">
+                  <Typography variant="body1" color="text.secondary" sx={{ py: 3 }}>
+                    No batches found.
+                  </Typography>
+                </TableCell>
+              </TableRow>
+            ) : (
+              batches.map((batch) => (
                 <TableRow
+                  key={batch.id}
                   sx={{
-                    backgroundColor: "primary.main",
-                    "& th": { fontWeight: "bold", color: "common.white", py: 2 },
+                    "&:hover": {
+                      backgroundColor: "grey.50",
+                      transition: "background-color 0.2s ease-in-out",
+                    },
                   }}
                 >
-                  <TableCell>ID</TableCell>
-                  <TableCell>Title</TableCell>
-                  <TableCell>Session</TableCell>
-                  <TableCell>Leaves Allowed</TableCell>
-                  <TableCell>Start Date</TableCell>
-                  <TableCell align="right">Actions</TableCell>
+                  <TableCell>{batch.id}</TableCell>
+                  <TableCell>{batch.title}</TableCell>
+                  <TableCell>{batch.session}</TableCell>
+                  <TableCell>{batch.leaves_allowed}</TableCell>
+                  <TableCell>{batch.working_days ?? "N/A"}</TableCell>
+                  <TableCell align="right">
+                    <Stack direction="row" spacing={1} justifyContent="flex-end">
+                      <Tooltip title="View">
+                        <IconButton
+                          onClick={() => handleView(batch.id)}
+                          sx={{ color: blue[600], "&:hover": { backgroundColor: blue[50] } }}
+                        >
+                          <VisibilityIcon />
+                        </IconButton>
+                      </Tooltip>
+                      <Tooltip title="Edit">
+                        <IconButton
+                          onClick={() => handleEdit(batch.id)}
+                          sx={{ color: green[600], "&:hover": { backgroundColor: green[50] } }}
+                        >
+                          <EditIcon />
+                        </IconButton>
+                      </Tooltip>
+                      <Tooltip title="Delete">
+                        <IconButton
+                          onClick={() => handleDelete(batch.id)}
+                          sx={{ color: red[600], "&:hover": { backgroundColor: red[50] } }}
+                        >
+                          <DeleteIcon />
+                        </IconButton>
+                      </Tooltip>
+                    </Stack>
+                  </TableCell>
                 </TableRow>
-              </TableHead>
-              <TableBody>
-                {batches.length === 0 ? (
-                  <TableRow>
-                    <TableCell colSpan={6} align="center">
-                      <Typography variant="body1" color="text.secondary" sx={{ py: 3 }}>
-                        No batches found.
-                      </Typography>
-                    </TableCell>
-                  </TableRow>
-                ) : (
-                  batches.map((batch) => (
-                    <TableRow
-                      key={batch.id}
-                      sx={{
-                        "&:hover": {
-                          backgroundColor: "grey.50",
-                          transition: "background-color 0.2s ease-in-out",
-                        },
-                      }}
-                    >
-                      <TableCell>{batch.id}</TableCell>
-                      <TableCell>{batch.title}</TableCell>
-                      <TableCell>{batch.session}</TableCell>
-                      <TableCell>{batch.leaves_allowed}</TableCell>
-                      <TableCell>{batch.start_date ?? "N/A"}</TableCell>
-                      <TableCell align="right">
-                        <Stack direction="row" spacing={1} justifyContent="flex-end">
-                          <Tooltip title="View">
-                            <IconButton
-                              onClick={() => handleView(batch.id)}
-                              sx={{ color: blue[600], "&:hover": { backgroundColor: blue[50] } }}
-                            >
-                              <VisibilityIcon />
-                            </IconButton>
-                          </Tooltip>
-                          <Tooltip title="Edit">
-                            <IconButton
-                              onClick={() => handleEdit(batch.id)}
-                              sx={{ color: green[600], "&:hover": { backgroundColor: green[50] } }}
-                            >
-                              <EditIcon />
-                            </IconButton>
-                          </Tooltip>
-                          <Tooltip title="Delete">
-                            <IconButton
-                              onClick={() => handleDelete(batch.id)}
-                              sx={{ color: red[600], "&:hover": { backgroundColor: red[50] } }}
-                            >
-                              <DeleteIcon />
-                            </IconButton>
-                          </Tooltip>
-                        </Stack>
-                      </TableCell>
-                    </TableRow>
-                  ))
-                )}
-              </TableBody>
-            </Table>
-          </TableContainer>
+              ))
+            )}
+          </TableBody>
+        </Table>
+      </TableContainer>
         )}
 
         {/* Delete Error Modal */}

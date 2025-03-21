@@ -20,7 +20,7 @@ interface Batch {
   title: string;
   session: string;
   leaves_allowed: number;
-  working_days: number;
+  working_days: number | null; // Allow working_days to be null
 }
 
 const BatchDetailsPage = () => {
@@ -53,7 +53,7 @@ const BatchDetailsPage = () => {
           title: data.title,
           session: data.session,
           leaves_allowed: data.leaves_allowed,
-          working_days: data.working_days,
+          working_days: data.working_days ?? null, // Set to null if working_days is missing
         };
 
         setBatch(transformedData);
@@ -142,7 +142,7 @@ const BatchDetailsPage = () => {
             </Grid>
             <Grid item xs={12} sm={6}>
               <Typography variant="body1" gutterBottom>
-                <strong>Working Days:</strong> {batch.working_days}
+                <strong>Working Days:</strong> {batch.working_days ?? "N/A"} {/* Display "N/A" if working_days is null or undefined */}
               </Typography>
             </Grid>
           </Grid>

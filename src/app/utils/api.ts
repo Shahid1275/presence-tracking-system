@@ -299,21 +299,68 @@ export const createBatch = async (
 };
 
 // Update a batch
+// api.ts
 export const updateBatch = async (
   id: number,
-  data: { title: string; session: string; leaves_allowed: number; working_days: number },
+  batchData: {
+    title: string;
+    session: string;
+    leaves_allowed: number;
+    start_date: string;
+    end_date: string | null; // Allow null to match your EditBatchPage logic
+  },
   token: string
 ) => {
-  return fetchData<{ message: string }>(`/batches/${id}/edit`, {
-    method: "PUT",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-    },
-    body: JSON.stringify(data),
-  });
-};
+  // Use the full external Laravel API URL
+  const apiUrl = `http://192.168.50.218/laravel-project/attendance-system/public/api/batches/${id}/edit`;
 
+  try {
+    const response = await fetch(apiUrl, {
+      method: "PUT",
+      headers: {
+        Accept: "application/json",
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(batchData),
+    });
+
+    if (!response.ok) {
+      const text = await response.text(); // Get raw response text first
+      let errorMessage = `Failed to update batch: ${response.status} ${response.statusText}`;
+
+      // Handle specific HTTP status codes
+      switch (response.status) {
+        case 400:
+          errorMessage = "Invalid data provided";
+          break;
+        case 404:
+          errorMessage = "Batch not found";
+          break;
+        case 401:
+          errorMessage = "Unauthorized - Invalid or expired token";
+          break;
+        case 500:
+          errorMessage = "Server error - Please try again later";
+          break;
+        default:
+          try {
+            const errorData = JSON.parse(text);
+            errorMessage = errorData.message || errorMessage;
+          } catch (jsonError) {
+            console.error("Non-JSON response from server:", text); // Log HTML for debugging
+            errorMessage += ` - Unexpected server response`;
+          }
+      }
+
+      throw new Error(errorMessage);
+    }
+
+    return response.json(); // Successful response should return JSON like { "data": { ... } }
+  } catch (err) {
+    throw err instanceof Error ? err : new Error("An unexpected error occurred during batch update");
+  }
+};
 // Delete a batch
 export const deleteBatch = async (id: number, token: string) => {
   const response = await fetch(`${API_BASE_URL}/batches/${id}`, {

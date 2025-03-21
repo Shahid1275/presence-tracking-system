@@ -21,10 +21,9 @@ interface Batch {
   id: number;
   title: string;
   start_date: string;
-  end_date: string | null;
+  end_date: string; // Added end_date to the interface
   session: string;
   leaves_allowed: number;
-  working_days: number;
   created_at?: string;
   updated_at?: string;
   deleted_at?: string | null;
@@ -40,9 +39,8 @@ const EditBatchPage = () => {
   const [session, setSession] = useState<string>("");
   const [sessionError, setSessionError] = useState<string>("");
   const [leavesAllowed, setLeavesAllowed] = useState<string>("");
-  const [workingDays, setWorkingDays] = useState<string>("");
   const [startDate, setStartDate] = useState<string>("");
-  const [endDate, setEndDate] = useState<string>("");
+  const [endDate, setEndDate] = useState<string>(""); // Added endDate state
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [success, setSuccess] = useState(false);
@@ -62,16 +60,13 @@ const EditBatchPage = () => {
         }
 
         const batchResponse = await getBatch(batchId, token);
-        console.log("Batch Response:", batchResponse);
-
         if (batchResponse.data) {
           const batch = batchResponse.data;
           setTitle(batch.title || "");
           setSession(batch.session || "");
           setLeavesAllowed(batch.leaves_allowed?.toString() || "");
-          setWorkingDays(batch.working_days?.toString() || "");
           setStartDate(batch.start_date || "");
-          setEndDate(batch.end_date || "");
+          setEndDate(batch.end_date || ""); // Set end_date from response
         } else {
           throw new Error("Batch not found.");
         }
@@ -130,50 +125,39 @@ const EditBatchPage = () => {
         throw new Error("Leaves Allowed must be a valid non-negative number.");
       }
 
-      const workingDaysNum = Number(workingDays);
-      if (isNaN(workingDaysNum) || workingDaysNum <= 0) {
-        throw new Error("Working Days must be a valid positive number.");
-      }
-
       if (!startDate) {
         throw new Error("Start Date is required.");
       }
 
+      if (!endDate) {
+        throw new Error("End Date is required."); // Validate end_date
+      }
+
       const parsedStartDate = new Date(startDate);
-      if (isNaN(parsedStartDate.getTime())) {
-        throw new Error("Start Date must be a valid date.");
+      const parsedEndDate = new Date(endDate);
+      if (isNaN(parsedStartDate.getTime()) || isNaN(parsedEndDate.getTime())) {
+        throw new Error("Start Date and End Date must be valid dates.");
       }
 
       const currentDateObj = new Date();
       currentDateObj.setHours(0, 0, 0, 0);
       parsedStartDate.setHours(0, 0, 0, 0);
+      parsedEndDate.setHours(0, 0, 0, 0);
+
       if (parsedStartDate < currentDateObj) {
         throw new Error("Start Date cannot be earlier than the current date.");
       }
 
-      let parsedEndDate: Date | null = null;
-      if (endDate) {
-        parsedEndDate = new Date(endDate);
-        if (isNaN(parsedEndDate.getTime())) {
-          throw new Error("End Date must be a valid date.");
-        }
-
-        if (parsedEndDate < currentDateObj) {
-          throw new Error("End Date cannot be earlier than the current date.");
-        }
-
-        if (parsedEndDate <= parsedStartDate) {
-          throw new Error("End Date must be after the Start Date.");
-        }
+      if (parsedEndDate <= parsedStartDate) {
+        throw new Error("End Date must be after Start Date.");
       }
 
       const batchData = {
         title,
         session,
         leaves_allowed: leavesAllowedNum,
-        working_days: workingDaysNum,
         start_date: startDate,
-        end_date: endDate || null,
+        end_date: endDate, // Include end_date in batchData
       };
 
       await updateBatch(batchId, batchData, token);
@@ -182,6 +166,7 @@ const EditBatchPage = () => {
       setTimeout(() => router.push(`/batches`), 1000);
     } catch (err) {
       setError(err instanceof Error ? err.message : "An error occurred");
+      console.error("Update Batch Error:", err);
     } finally {
       setLoading(false);
     }
@@ -190,9 +175,6 @@ const EditBatchPage = () => {
   return (
     <Layout>
       <Paper sx={{ p: 4, maxWidth: 600, mx: "auto", mt: 4, borderRadius: 2, boxShadow: 3 }}>
-        <Button startIcon={<ArrowBackIcon />} onClick={() => router.back()} sx={{ mb: 2 }}>
-          Back
-        </Button>
         <Typography variant="h4" gutterBottom sx={{ fontWeight: "bold" }}>
           Edit Batch:{" "}
           <span style={{ color: "#1976d2" }}>
@@ -238,16 +220,6 @@ const EditBatchPage = () => {
             />
             <TextField
               fullWidth
-              label="Working Days"
-              type="number"
-              value={workingDays}
-              onChange={(e) => setWorkingDays(e.target.value)}
-              margin="normal"
-              required
-              sx={{ mb: 2 }}
-            />
-            <TextField
-              fullWidth
               label="Start Date"
               type="date"
               value={startDate}
@@ -264,17 +236,12 @@ const EditBatchPage = () => {
               label="End Date"
               type="date"
               value={endDate}
-              onChange={(e) => setEndDate(e.target.value)}
+              onChange={(e) => setEndDate(e.target.value)} // Handle end_date input
               margin="normal"
+              required
               InputLabelProps={{ shrink: true }}
-              inputProps={{
-                min: startDate || currentDate,
-              }}
-              helperText={
-                startDate
-                  ? `Must be after ${startDate}`
-                  : `Must be on or after ${currentDate}`
-              }
+              inputProps={{ min: startDate }} // Ensure end_date is after start_date
+              helperText="Must be after Start Date"
               sx={{ mb: 2 }}
             />
             <Stack direction="row" spacing={2} sx={{ mt: 2 }}>
@@ -287,7 +254,8 @@ const EditBatchPage = () => {
                   !!sessionError ||
                   !title.trim() ||
                   !session.trim() ||
-                  !startDate
+                  !startDate ||
+                  !endDate
                 }
               >
                 Update

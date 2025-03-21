@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Layout from "../../components/Layout";
 import {
@@ -10,7 +10,15 @@ import {
   Alert,
   Paper,
   Stack,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Fade,
 } from "@mui/material";
+import { red } from "@mui/material/colors";
+import { TransitionProps } from "@mui/material/transitions";
+import React from "react";
 
 interface Batch {
   id: number;
@@ -23,18 +31,54 @@ interface Batch {
   deleted_at?: string | null;
 }
 
+const Transition = React.forwardRef(function Transition(
+  props: TransitionProps & { children: React.ReactElement<any, any> },
+  ref: React.Ref<unknown>
+) {
+  return <Fade ref={ref} {...props} timeout={500} />;
+});
+
 const CreateBatchPage = () => {
   const [title, setTitle] = useState<string>("");
   const [titleError, setTitleError] = useState<string>("");
   const [session, setSession] = useState<string>("");
   const [sessionError, setSessionError] = useState<string>("");
   const [leavesAllowed, setLeavesAllowed] = useState<string>("");
+  const [startDate, setStartDate] = useState<string>("");
   const [error, setError] = useState<string | null>(null);
+  const [openErrorModal, setOpenErrorModal] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
+  const [existingTitles, setExistingTitles] = useState<string[]>([]);
   const router = useRouter();
 
   // Get the current date in YYYY-MM-DD format for the min attribute
   const currentDate = new Date().toISOString().split("T")[0];
+
+  // Fetch existing batches to check for duplicate titles
+  useEffect(() => {
+    const fetchBatches = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        if (!token) return;
+
+        const response = await fetch("/api/batches", {
+          headers: {
+            Accept: "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        if (!response.ok) throw new Error("Failed to fetch batches");
+        const data = await response.json();
+        const titles = data.data.map((batch: Batch) => batch.title);
+        setExistingTitles(titles);
+      } catch (err) {
+        console.error("Error fetching batches:", err);
+      }
+    };
+
+    fetchBatches();
+  }, []);
 
   // Real-time validation for title
   const handleTitleChange = (value: string) => {
@@ -42,6 +86,8 @@ const CreateBatchPage = () => {
     const titleRegex = /^batch-\d*$/;
     if (!titleRegex.test(value) && value !== "") {
       setTitleError("Must be in the format 'batch-14'");
+    } else if (existingTitles.includes(value)) {
+      setTitleError("This batch title already exists");
     } else {
       setTitleError("");
     }
@@ -63,44 +109,60 @@ const CreateBatchPage = () => {
     setLoading(true);
     setError(null);
 
+    // Client-side validation
+    if (!title.trim()) {
+      setTitleError("Batch title is required");
+      setLoading(false);
+      return;
+    }
+    if (!session.trim()) {
+      setSessionError("Session is required");
+      setLoading(false);
+      return;
+    }
+    const leavesAllowedNum = Number(leavesAllowed);
+    if (isNaN(leavesAllowedNum) || leavesAllowedNum < 0) {
+      setError("Leaves Allowed must be a valid non-negative number");
+      setOpenErrorModal(true);
+      setLoading(false);
+      return;
+    }
+    if (leavesAllowedNum > 100) {
+      setError("Leaves Allowed must not exceed 100");
+      setOpenErrorModal(true);
+      setLoading(false);
+      return;
+    }
+    if (!startDate) {
+      setError("Start Date is required");
+      setOpenErrorModal(true);
+      setLoading(false);
+      return;
+    }
+    const parsedStartDate = new Date(startDate);
+    if (isNaN(parsedStartDate.getTime())) {
+      setError("Start Date must be a valid date");
+      setOpenErrorModal(true);
+      setLoading(false);
+      return;
+    }
+    const currentDateObj = new Date();
+    currentDateObj.setHours(0, 0, 0, 0);
+    parsedStartDate.setHours(0, 0, 0, 0);
+    if (parsedStartDate < currentDateObj) {
+      setError("Start Date cannot be earlier than the current date");
+      setOpenErrorModal(true);
+      setLoading(false);
+      return;
+    }
+
     try {
       const token = localStorage.getItem("token");
       if (!token) {
-        throw new Error("No token found. Please log in.");
-      }
-
-      // Basic required field checks
-      if (!title.trim()) {
-        throw new Error("Batch title is required.");
-      }
-
-      if (!session.trim()) {
-        throw new Error("Session is required.");
-      }
-
-      const leavesAllowedNum = Number(leavesAllowed);
-      if (isNaN(leavesAllowedNum) || leavesAllowedNum < 0) {
-        throw new Error("Leaves Allowed must be a valid non-negative number.");
-      }
-      if (leavesAllowedNum > 100) {
-        throw new Error("Leaves Allowed must not exceed 100.");
-      }
-
-      if (!startDate) {
-        throw new Error("Start Date is required.");
-      }
-
-      const parsedStartDate = new Date(startDate);
-      if (isNaN(parsedStartDate.getTime())) {
-        throw new Error("Start Date must be a valid date.");
-      }
-
-      // Validate that the start_date is not less than the current date
-      const currentDateObj = new Date();
-      currentDateObj.setHours(0, 0, 0, 0);
-      parsedStartDate.setHours(0, 0, 0, 0);
-      if (parsedStartDate < currentDateObj) {
-        throw new Error("Start Date cannot be earlier than the current date.");
+        setError("No token found. Please log in.");
+        setOpenErrorModal(true);
+        setLoading(false);
+        return;
       }
 
       const batchData = {
@@ -122,19 +184,27 @@ const CreateBatchPage = () => {
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.message || `HTTP error! Status: ${response.status}`);
+        setError(errorData.message || `HTTP error! Status: ${response.status}`);
+        setOpenErrorModal(true);
+        setLoading(false);
+        return;
       }
 
       const data = await response.json();
       console.log("Batch created:", data);
-
       router.push("/batches");
     } catch (err) {
       console.error("Error creating batch:", err);
       setError(err instanceof Error ? err.message : "An error occurred");
+      setOpenErrorModal(true);
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleCloseModal = () => {
+    setOpenErrorModal(false);
+    setError(null);
   };
 
   return (
@@ -143,7 +213,6 @@ const CreateBatchPage = () => {
         <Typography variant="h4" component="h1" gutterBottom>
           Create Batch
         </Typography>
-        {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
         <form onSubmit={handleSubmit}>
           <TextField
             fullWidth
@@ -176,6 +245,8 @@ const CreateBatchPage = () => {
             margin="normal"
             required
             disabled={loading}
+            inputProps={{ min: 0, max: 100 }}
+            helperText="Must be between 0 and 100"
           />
           <TextField
             fullWidth
@@ -210,6 +281,38 @@ const CreateBatchPage = () => {
           </Stack>
         </form>
       </Paper>
+
+      {/* Error Modal */}
+      <Dialog
+        open={openErrorModal}
+        onClose={handleCloseModal}
+        TransitionComponent={Transition}
+        aria-labelledby="error-dialog-title"
+        sx={{
+          "& .MuiDialog-paper": {
+            borderRadius: 2,
+            boxShadow: "0 4px 20px rgba(0, 0, 0, 0.1)",
+            minWidth: "400px",
+          },
+        }}
+      >
+        <DialogTitle id="error-dialog-title" sx={{ bgcolor: red[50], color: red[800] }}>
+          Error
+        </DialogTitle>
+        <DialogContent sx={{ mt: 2 }}>
+          <Typography variant="body1">{error}</Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button
+            onClick={handleCloseModal}
+            variant="contained"
+            color="primary"
+            sx={{ m: 2, borderRadius: 2 }}
+          >
+            Close
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Layout>
   );
 };

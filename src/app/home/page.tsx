@@ -1,11 +1,26 @@
 "use client";
-import { useEffect, useState } from "react";
+
+import { useEffect } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import Layout from "../components/Layout";
+import {
+  Box,
+  Typography,
+  Button,
+  Container,
+  Grid,
+  Card,
+  CardContent,
+  useTheme,
+  useMediaQuery,
+} from "@mui/material";
+import { motion } from "framer-motion";
 
 export default function HomePage() {
   const searchParams = useSearchParams();
   const router = useRouter();
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -17,17 +32,167 @@ export default function HomePage() {
     }
   }, [searchParams, router]);
 
+  // Animation variants for Framer Motion
+  const fadeInUp = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.6 } },
+  };
+
+  const staggerContainer = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.2,
+      },
+    },
+  };
+
   return (
     <Layout>
-      <div className="container mx-auto p-4 h-screen flex flex-col items-center justify-center text-center overflow-hidden">
-        {/* Responsive Heading */}
-        <h2 className="text-3xl font-bold mb-4">
-         Welcome To Home Page
-        </h2>
+      {/* Hero Section */}
+      <Box
+        sx={{
+          position: "relative",
+          height: "100vh",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          color: "white",
+          textAlign: "center",
+          backgroundColor: theme.palette.primary.main,
+        }}
+      >
+        <Container>
+          <motion.div
+            initial="hidden"
+            animate="visible"
+            variants={fadeInUp}
+          >
+            <Typography
+              variant={isMobile ? "h3" : "h2"}
+              component="h1"
+              sx={{ fontWeight: "bold", mb: 3 }}
+            >
+              Welcome to Our Attendance Management System
+            </Typography>
+            <Typography variant={isMobile ? "h6" : "h5"} sx={{ mb: 4 }}>
+              Streamline attendance tracking with our powerful and intuitive system.
+            </Typography>
+            <Button
+              variant="contained"
+              color="secondary"
+              size="large"
+              sx={{ borderRadius: 2, px: 5, py: 1.5 }}
+              onClick={() => router.push("/attendances")}
+            >
+              Get Started
+            </Button>
+          </motion.div>
+        </Container>
+      </Box>
 
-        
-        
-      </div>
+      {/* Features Section */}
+      <Container sx={{ py: 8 }}>
+        <Typography
+          variant="h4"
+          component="h2"
+          sx={{ fontWeight: "bold", textAlign: "center", mb: 6 }}
+        >
+          Key Features
+        </Typography>
+        <motion.div
+          variants={staggerContainer}
+          initial="hidden"
+          animate="visible"
+        >
+          <Grid container spacing={4}>
+            {/* Feature 1 */}
+            <Grid item xs={12} md={4}>
+              <motion.div variants={fadeInUp}>
+                <Card
+                  sx={{
+                    height: "100%",
+                    borderRadius: 2,
+                    boxShadow: 3,
+                    transition: "transform 0.3s ease-in-out",
+                    "&:hover": { transform: "scale(1.05)" },
+                  }}
+                >
+                  <CardContent>
+                    <Typography
+                      variant="h6"
+                      component="h3"
+                      sx={{ fontWeight: "bold", mb: 2 }}
+                    >
+                      Real-Time Tracking
+                    </Typography>
+                    <Typography variant="body1">
+                      Monitor attendance in real-time with live updates and notifications.
+                    </Typography>
+                  </CardContent>
+                </Card>
+              </motion.div>
+            </Grid>
+
+            {/* Feature 2 */}
+            <Grid item xs={12} md={4}>
+              <motion.div variants={fadeInUp}>
+                <Card
+                  sx={{
+                    height: "100%",
+                    borderRadius: 2,
+                    boxShadow: 3,
+                    transition: "transform 0.3s ease-in-out",
+                    "&:hover": { transform: "scale(1.05)" },
+                  }}
+                >
+                  <CardContent>
+                    <Typography
+                      variant="h6"
+                      component="h3"
+                      sx={{ fontWeight: "bold", mb: 2 }}
+                    >
+                      Easy Reporting
+                    </Typography>
+                    <Typography variant="body1">
+                      Generate detailed reports with just a few clicks.
+                    </Typography>
+                  </CardContent>
+                </Card>
+              </motion.div>
+            </Grid>
+
+            {/* Feature 3 */}
+            <Grid item xs={12} md={4}>
+              <motion.div variants={fadeInUp}>
+                <Card
+                  sx={{
+                    height: "100%",
+                    borderRadius: 2,
+                    boxShadow: 3,
+                    transition: "transform 0.3s ease-in-out",
+                    "&:hover": { transform: "scale(1.05)" },
+                  }}
+                >
+                  <CardContent>
+                    <Typography
+                      variant="h6"
+                      component="h3"
+                      sx={{ fontWeight: "bold", mb: 2 }}
+                    >
+                      Mobile-Friendly
+                    </Typography>
+                    <Typography variant="body1">
+                      Access the system on any device, anytime, anywhere.
+                    </Typography>
+                  </CardContent>
+                </Card>
+              </motion.div>
+            </Grid>
+          </Grid>
+        </motion.div>
+      </Container>
     </Layout>
   );
 }
